@@ -1,0 +1,16 @@
+# Uncomment the next line to define a global platform for your project
+platform :ios, '9.0'
+use_frameworks!
+install! 'cocoapods', :deterministic_uuids => false
+
+target 'YiLan' do
+  pod "UnrarKit"
+  pod 'SSZipArchive', '~> 0.3.2'
+  pod 'LzmaSDK-ObjC', :inhibit_warnings => true
+end
+
+target 'YiLanPreviewExtension' do
+  pod "UnrarKit"
+  pod 'SSZipArchive', '~> 0.3.2'
+  pod 'LzmaSDK-ObjC', :inhibit_warnings => true
+end

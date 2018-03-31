@@ -1,0 +1,62 @@
+{
+  "name": "YiLan",
+  "version": "0.0.2",
+  "private": true,
+  "scripts": {
+    "postinstall": "./scripts/postinstall.sh",
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "node_modules/.bin/jest",
+    "run-android": "node_modules/.bin/react-native run-android",
+    "run-ios": "node_modules/.bin/react-native run-ios",
+    "clean": "./scripts/clean.sh",
+    "lint": "node_modules/.bin/eslint src/**"
+  },
+  "dependencies": {
+    "@blankapp/ui": "git+https://github.com/blankapp/ui.git",
+    "buffer": "^5.1.0",
+    "iconv-lite": "^0.4.19",
+    "jschardet": "^1.6.0",
+    "lodash": "^4.17.5",
+    "marked": "^0.3.19",
+    "moment": "^2.21.0",
+    "numeral": "^2.0.6",
+    "prop-types": "^15.6.1",
+    "react": "16.2.0",
+    "react-native": "^0.54.0",
+    "react-native-device-info": "^0.17.4",
+    "react-native-fetch-blob": "^0.10.8",
+    "react-native-fs": "^2.9.11",
+    "react-native-mail": "^3.0.6",
+    "react-native-pdf": "^3.0.5",
+    "react-native-vector-icons": "^4.5.0",
+    "react-navigation": "^1.4.0",
+    "stream": "^0.0.2",
+    "uuid": "^3.2.1"
+  },
+  "devDependencies": {
+    "babel-eslint": "^8.2.2",
+    "babel-jest": "22.4.1",
+    "babel-plugin-transform-remove-console": "^6.9.0",
+    "babel-preset-react-native": "4.0.0",
+    "eslint": "^4.18.2",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.9.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.7.0",
+    "jest": "22.4.2",
+    "pre-commit": "^1.2.2",
+    "react-test-renderer": "16.2.0"
+  },
+  "jest": {
+    "setupFiles": [
+      "<rootDir>/jest-setup.js"
+    ],
+    "transform": {
+      "^.+\\.js$": "<rootDir>/jest-transform.js"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!react-native|react-navigation)/"
+    ],
+    "preset": "react-native"
+  }
+}

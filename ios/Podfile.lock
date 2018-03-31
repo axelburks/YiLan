@@ -1,0 +1,20 @@
+PODS:
+  - LzmaSDK-ObjC (2.0.18)
+  - SSZipArchive (0.3.3)
+  - UnrarKit (2.8.1):
+    - UnrarKit/unrar-lib (= 2.8.1)
+  - UnrarKit/unrar-lib (2.8.1)
+
+DEPENDENCIES:
+  - LzmaSDK-ObjC
+  - SSZipArchive (~> 0.3.2)
+  - UnrarKit
+
+SPEC CHECKSUMS:
+  LzmaSDK-ObjC: 51989e701d65e54af02c88709bee5d39dd22d148
+  SSZipArchive: 2cf2a6d3ac9f03252b7d96f93728b9b983be9afb
+  UnrarKit: 167602bda6542e575c4cdc068509d6b787f84468
+
+PODFILE CHECKSUM: df3b1758871715262f54ab16c05f793a0e5816b4
+
+COCOAPODS: 1.4.0
