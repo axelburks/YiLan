@@ -1,13 +1,37 @@
+import {
+  transparent,
+  textPrimary,
+  textSecondary,
+} from './colors';
+
 export default {
   ListEmptyIndicator: {
-    justifyContent: 'center',
+    flex: 1,
+    minHeight: 360,
     alignItems: 'center',
-    marginTop: 120,
-    marginBottom: 60,
-    Title: {
+    justifyContent: 'flex-start',
+    paddingTop: 80,
+    Image: {
+      marginBottom: 40,
     },
-    Text: {
-      textAlign: 'center',
-    },
+  },
+  ListEmptyIndicatorTitle: {
+    color: textPrimary,
+    backgroundColor: transparent,
+    fontSize: 18,
+    // marginTop: 20,
+    // marginBottom: 20,
+    textAlign: 'center',
+  },
+  ListEmptyIndicatorMessage: {
+    color: textSecondary,
+    backgroundColor: transparent,
+    fontSize: 14,
+    marginTop: 20,
+    marginBottom: 20,
+    paddingLeft: 20,
+    paddingRight: 20,
+    textAlign: 'center',
+    lineHeight: 20,
   },
 };

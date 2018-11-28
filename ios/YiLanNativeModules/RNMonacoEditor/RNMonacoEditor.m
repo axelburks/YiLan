@@ -8,6 +8,16 @@
 
 @interface RCT_EXTERN_MODULE(RNMonacoEditorManager, RCTViewManager)
 
+//- (instancetype)init
+//{
+//  return [self initWithRedirectDelegate:nil];
+//}
+
++ (BOOL)requiresMainQueueSetup
+{
+  return NO;
+}
+
 RCT_EXPORT_VIEW_PROPERTY(value, NSString)
 RCT_EXPORT_VIEW_PROPERTY(language, NSString)
 RCT_EXPORT_VIEW_PROPERTY(readOnly, BOOL)

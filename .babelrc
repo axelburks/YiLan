@@ -1,11 +1,8 @@
 {
-  "presets": ["react-native"],
+  "presets": ["module:metro-react-native-babel-preset"],
   "env": {
-    "jest": true,
     "production": {
-      "plugins": [
-        ["transform-remove-console"]
-      ]
+      "plugins": ["transform-remove-console"]
     }
   }
 }

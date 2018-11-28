@@ -1,36 +1,49 @@
 import React, { Component } from 'react';
-import { Alert, Platform, StatusBar } from 'react-native';
+import { Alert, StatusBar } from 'react-native';
 import Theme, { ThemeProvider } from '@blankapp/ui';
+import I18n, { t } from '@blankapp/plugin-i18n';
+import moment from 'moment';
+import defaultTheme from '@blankapp/ui/src/resources/themes/default';
+import defaultThemePro from '@blankapp/ui-pro/src/resources/themes/default';
+import defaultThemeExtend from './resources/themes/default';
 import AppNavigator from './navigators/AppNavigator';
-import defaultTheme from './resources/themes/default';
+import NavigationService from './navigators/NavigationService';
+import languages from './resources/locales';
+import 'moment/locale/zh-cn';
+import 'moment/locale/zh-hk';
 
-Theme.registerDefaultTheme(defaultTheme);
+I18n.register(languages);
+I18n.useLocale('zh-Hans');
+moment.locale('zh-cn');
 
-alert = (text) => {
-  setTimeout(() => {
-    Alert.alert(
-      text,
-      undefined,
-      undefined,
-      { cancelable: false },
-    );
-  }, 200);
+Theme.registerTheme('default', [
+  defaultTheme,
+  defaultThemePro,
+  defaultThemeExtend,
+]);
+
+global.alert = (message) => {
+  Alert.alert(message, undefined, [
+    {
+      text: t('globals.buttonOk'),
+    },
+  ]);
 };
-
 class App extends Component {
   constructor(props) {
     super(props);
-    if (Platform.OS === 'android') {
-      StatusBar.setTranslucent(true);
-      StatusBar.setBackgroundColor('rgba(0, 0, 0, 0.2)');
-    }
-    StatusBar.setBarStyle('dark-content');
+    StatusBar.setBarStyle('light-content');
   }
 
   render() {
     return (
       <ThemeProvider>
-        <AppNavigator />
+        <AppNavigator
+          ref={(navigatorRef) => {
+            this.topLevelNavigator = navigatorRef;
+            NavigationService.setTopLevelNavigator(navigatorRef);
+          }}
+        />
       </ThemeProvider>
     );
   }

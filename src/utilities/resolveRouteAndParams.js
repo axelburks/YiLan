@@ -1,16 +1,18 @@
-import ArchivePreviewerSupportedFileTypes from '../screens/ArchivePreviewer/SupportedFileTypes';
-import CodePreviewerSupportedFileTypes from '../screens/CodePreviewer/SupportedFileTypes';
-import HtmlPreviewerSupportedFileTypes from '../screens/HtmlPreviewer/SupportedFileTypes';
-import MarkdownPreviewerSupportedFileTypes from '../screens/MarkdownPreviewer/SupportedFileTypes';
-import PdfPreviewerSupportedFileTypes from '../screens/PdfPreviewer/SupportedFileTypes';
+import PreviewOfArchiveSupportedFileTypes from '../screens/PreviewOfArchive/SupportedFileTypes';
+import PreviewOfCodeSupportedFileTypes from '../screens/PreviewOfCode/SupportedFileTypes';
+import PreviewOfHtmlSupportedFileTypes from '../screens/PreviewOfHtml/SupportedFileTypes';
+import PreviewOfImageSupportedFileTypes from '../screens/PreviewOfImage/SupportedFileTypes';
+import PreviewOfMarkdownSupportedFileTypes from '../screens/PreviewOfMarkdown/SupportedFileTypes';
+import PreviewOfPdfSupportedFileTypes from '../screens/PreviewOfPdf/SupportedFileTypes';
+
 
 const resolveRouteAndParams = (previewData) => {
   const { type } = previewData;
   if (type === 'text') {
-    return { routeName: 'Unsupported', params: previewData };
+    return { routeName: 'PreviewOfPlainText', params: previewData };
   }
   if (type === 'url') {
-    return { routeName: 'Unsupported', params: previewData };
+    return { routeName: 'PreviewOfUnsupported', params: previewData };
   }
   if (type === 'file') {
     const {
@@ -23,24 +25,27 @@ const resolveRouteAndParams = (previewData) => {
       const fileExtensions = item.extensions || [];
       return fileNames.includes(fileName) || fileExtensions.includes(fileExtension);
     };
-    if (ArchivePreviewerSupportedFileTypes.findIndex(findIndexFn) >= 0) {
-      return { routeName: 'ArchivePreviewer', params: previewData };
+    if (PreviewOfArchiveSupportedFileTypes.findIndex(findIndexFn) >= 0) {
+      return { routeName: 'PreviewOfArchive', params: previewData };
     }
-    if (MarkdownPreviewerSupportedFileTypes.findIndex(findIndexFn) >= 0) {
-      return { routeName: 'MarkdownPreviewer', params: previewData };
+    if (PreviewOfHtmlSupportedFileTypes.findIndex(findIndexFn) >= 0) {
+      return { routeName: 'PreviewOfHtml', params: previewData };
     }
-    if (PdfPreviewerSupportedFileTypes.findIndex(findIndexFn) >= 0) {
-      return { routeName: 'PdfPreviewer', params: previewData };
+    if (PreviewOfImageSupportedFileTypes.findIndex(findIndexFn) >= 0) {
+      return { routeName: 'PreviewOfImage', params: previewData };
     }
-    if (HtmlPreviewerSupportedFileTypes.findIndex(findIndexFn) >= 0) {
-      return { routeName: 'HtmlPreviewer', params: previewData };
+    if (PreviewOfMarkdownSupportedFileTypes.findIndex(findIndexFn) >= 0) {
+      return { routeName: 'PreviewOfMarkdown', params: previewData };
     }
-    if (CodePreviewerSupportedFileTypes.findIndex(findIndexFn) >= 0) {
-      return { routeName: 'CodePreviewer', params: previewData };
+    if (PreviewOfPdfSupportedFileTypes.findIndex(findIndexFn) >= 0) {
+      return { routeName: 'PreviewOfPdf', params: previewData };
+    }
+    if (PreviewOfCodeSupportedFileTypes.findIndex(findIndexFn) >= 0) {
+      return { routeName: 'PreviewOfCode', params: previewData };
     }
   }
 
-  return { routeName: 'Unsupported', params: previewData };
+  return { routeName: 'PreviewOfUnsupported', params: previewData };
 };
 
 export default resolveRouteAndParams;
