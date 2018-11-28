@@ -1,49 +1,57 @@
-import { transparent, textPrimary } from './colors';
-import { fontSizeButton } from './dimens';
+import { Platform } from 'react-native';
+import {
+  white,
+  themePrimary,
+  // textPrimary,
+} from '@blankapp/ui/src/resources/themes/default/colors';
+import { fontSizeTitle } from '@blankapp/ui/src/resources/themes/default/dimens';
+
+const getAppBarHeight = (isLandscape) => {
+  let appBarHeight = 56;
+  if (Platform.OS === 'ios') {
+    appBarHeight = isLandscape && !Platform.isPad ? 32 : 44;
+  }
+  return appBarHeight;
+};
 
 export default {
+  AppBar: {
+    backgroundColor: themePrimary,
+    borderBottomColor: themePrimary,
+    height: getAppBarHeight(),
+  },
   AppBarBackButton: {
-    activeOpacity: 0.8,
-    backgroundColor: transparent,
-    width: 42,
-    height: 42,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
     Icon: {
-      color: textPrimary,
-      size: 42 / 2,
+      padding: 0,
+      size: 24,
+      color: white,
+      width: getAppBarHeight(),
+      height: getAppBarHeight(),
+      lineHeight: getAppBarHeight(),
+      textAlign: 'center',
     },
   },
   AppBarButton: {
-    activeOpacity: 0.8,
-    backgroundColor: transparent,
-    paddingTop: 0,
-    paddingRight: 8,
-    paddingBottom: 0,
-    paddingLeft: 8,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    paddingLeft: 10,
+    paddingRight: 10,
     Text: {
-      alignItems: 'stretch',
-      fontSize: fontSizeButton,
-      fontWeight: 'bold',
-      color: textPrimary,
-      minWidth: 48,
+      color: white,
     },
   },
   AppBarIconButton: {
-    activeOpacity: 0.8,
-    backgroundColor: transparent,
-    width: 42,
-    height: 42,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
     Icon: {
-      color: textPrimary,
-      size: 42 / 2,
+      padding: 0,
+      size: 24,
+      color: white,
+      width: getAppBarHeight(),
+      height: getAppBarHeight(),
+      lineHeight: getAppBarHeight(),
+      textAlign: 'center',
     },
+  },
+  AppBarTitle: {
+    color: white,
+    fontSize: fontSizeTitle,
+    fontWeight: '500',
   },
 };

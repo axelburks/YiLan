@@ -1,9 +1,10 @@
 import UIKit
 import MobileCoreServices
+import SVProgressHUD
 
 class ActionViewController: UIViewController, UIViewControllerTransitioningDelegate {
   @IBOutlet weak var imageView: UIImageView!
-  
+
   var reactNativeRootView: RCTRootView?
 
   override func viewDidLoad() {
@@ -28,12 +29,14 @@ class ActionViewController: UIViewController, UIViewControllerTransitioningDeleg
     )
     rootView?.backgroundColor = UIColor.init(red: 1.0, green: 1.0, blue: 1.0, alpha: 1)
     rootView?.frame = self.view.frame
-    
-    self.view = rootView!
+
+    self.view.addSubview(rootView!)
     self.reactNativeRootView = rootView
+
+    SVProgressHUD.setViewForExtension(self.view)
     RNPreviewExtension.extensionContext = self.extensionContext
   }
-  
+
   override func viewDidDisappear(_ animated: Bool) {
     super.viewDidDisappear(animated)
     self.reactNativeRootView?.removeFromSuperview()
@@ -46,6 +49,25 @@ class ActionViewController: UIViewController, UIViewControllerTransitioningDeleg
     // Dispose of any resources that can be recreated.
   }
 
+  func screenSnapshot() -> UIImage? {
+    UIGraphicsBeginImageContextWithOptions(self.view.bounds.size, false, UIScreen.main.scale)
+
+    self.view.drawHierarchy(in: self.view.bounds, afterScreenUpdates: true)
+
+    let image = UIGraphicsGetImageFromCurrentImageContext()!
+    UIGraphicsEndImageContext()
+
+    let ciImage: CIImage = CIImage(image: image)!
+
+    let detector = CIDetector(ofType: CIDetectorTypeQRCode, context:nil,options:[CIDetectorAccuracy:CIDetectorAccuracyHigh])
+
+    let features = detector?.features(in: ciImage)
+    for feature in features as! [CIQRCodeFeature] {
+      print(feature.messageString ?? "")
+    }
+
+    return image
+  }
 
   func writeYilanPreviewData(_ typeIdentifier: String, result: NSSecureCoding?) {
     guard let directoryUrl = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.me.thecode.yilanapp") else { return }
@@ -59,15 +81,23 @@ class ActionViewController: UIViewController, UIViewControllerTransitioningDeleg
         dataType = "url"
         dataContent = (result as! NSURL).absoluteString!
       } else {
-        if let fileURL = result as? NSURL {
-          let fileName: String = fileURL.lastPathComponent!
-          let filePath: String = directoryUrl.appendingPathComponent("\(UUID().uuidString).\(fileURL.pathExtension!)").path
+        let fileManager = FileManager.default;
 
-          if (FileManager.default.fileExists(atPath: filePath)) {
-            try FileManager.default.removeItem(atPath: filePath)
+        if let fileURL = result as? NSURL {
+          let dir = "\(directoryUrl.path)/files/"
+
+          if (!fileManager.fileExists(atPath: "\(directoryUrl.path)/files")) {
+            try fileManager.createDirectory(atPath: dir, withIntermediateDirectories: true, attributes: nil)
           }
-          try FileManager.default.copyItem(atPath: fileURL.path!, toPath: filePath)
-          
+
+          let fileName: String = fileURL.lastPathComponent!
+          let filePath: String = "\(dir)\(UUID().uuidString).\(fileURL.pathExtension!)";
+
+          if (fileManager.fileExists(atPath: filePath)) {
+            try fileManager.removeItem(atPath: filePath)
+          }
+          try fileManager.copyItem(atPath: fileURL.path!, toPath: filePath)
+
           dataType = "file"
           dataContent = fileName
           previewData.updateValue(fileName, forKey: "extraFileName")
@@ -77,7 +107,7 @@ class ActionViewController: UIViewController, UIViewControllerTransitioningDeleg
           dataContent = result as! String
         }
       }
-      
+
       previewData.updateValue(dataType, forKey: "type")
       previewData.updateValue(dataContent, forKey: "content")
 
@@ -95,7 +125,7 @@ class ActionViewController: UIViewController, UIViewControllerTransitioningDeleg
       print(error)
     }
   }
-  
+
   @IBAction func done() {
     // Return any edited content to the host app.
     // This template doesn't do anything, so we just echo the passed in items.

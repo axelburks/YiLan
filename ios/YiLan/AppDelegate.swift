@@ -1,4 +1,5 @@
 import UIKit
+import SVProgressHUD
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -25,6 +26,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     rootViewController.view = rootView
     self.window!.rootViewController = rootViewController
     self.window!.makeKeyAndVisible()
+
+    SVProgressHUD.setViewForExtension(self.window!)
+    RNSplashScreen.show()
     return true
   }
 

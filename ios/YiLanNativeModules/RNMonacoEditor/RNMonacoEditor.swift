@@ -28,6 +28,7 @@ class RNMonacoEditor : UIView, WKUIDelegate, WKNavigationDelegate {
     self.webView = WKWebView(frame: frame)
     self.webView.configuration.userContentController.add(self, name: WebViewMessagePageReady)
     self.webView.configuration.userContentController.add(self, name: WebViewMessageEditorReady)
+    self.webView.scrollView.bounces = false
     self.webView.uiDelegate = self
     self.webView.navigationDelegate = self
     self.webView.loadFileURL(sourceURL, allowingReadAccessTo: readAccessURL)

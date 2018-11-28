@@ -1,77 +1,85 @@
 import React, { Component } from 'react';
-import { DeviceEventEmitter, Linking, SectionList, Share } from 'react-native';
-import { Divider, Screen, Text, View } from '@blankapp/ui';
+import {
+  DeviceEventEmitter,
+  Linking,
+  SectionList,
+  Share,
+} from 'react-native';
+import {
+  ListItem,
+  ListSection,
+  Screen,
+  Text,
+  View,
+} from '@blankapp/ui';
+import { t } from '@blankapp/plugin-i18n';
+import RNFetchBlob from 'rn-fetch-blob';
 import DeviceInfo from 'react-native-device-info';
 import Mailer from 'react-native-mail';
-import RNFS from 'react-native-fs';
-import { ListItem } from '../../components';
-import Lang from '../../utilities/Lang';
-import StoreReview from '../../modules/StoreReview';
+import { ProgressHUD, StoreReview } from '../../modules';
+import { APP_GROUP } from '../../utilities/constants';
+
+// eslint-disable-next-line
+const fs = RNFetchBlob.fs;
 
 class Settings extends Component {
-  static navigationOptions = {
-    title: Lang.get('screens.settings.title'),
+  // eslint-disable-next-line
+  static navigationOptions = ({ navigation, screenProps }) => {
+    return {
+      title: t('screens.settings.title'),
+    };
   };
 
   constructor(props) {
     super(props);
+    // eslint-disable-next-line
     this.navigation = this.props.navigation;
 
-    this.pressItemUserGuide = this.pressItemUserGuide.bind(this);
-    this.pressItemClearCache = this.pressItemClearCache.bind(this);
-    this.pressItemGetSupport = this.pressItemGetSupport.bind(this);
-    this.pressItemSuggestions = this.pressItemSuggestions.bind(this);
-    this.pressItemShare = this.pressItemShare.bind(this);
+    this.handlePressItemClearCache = this.handlePressItemClearCache.bind(this);
+    this.handlePressItemGetSupport = this.handlePressItemGetSupport.bind(this);
+    this.handlePressItemSuggestions = this.handlePressItemSuggestions.bind(this);
+    this.handlePressItemShare = this.handlePressItemShare.bind(this);
     this.renderSectionHeader = this.renderSectionHeader.bind(this);
     this.renderItem = this.renderItem.bind(this);
 
     this.state = {
       sectionsSource: [
         {
-          title: null,
+          title: t('screens.settings.listSectionItemGeneral'),
           data: [
             {
-              title: Lang.get('screens.settings.listItemUserGuide'),
-              onPress: this.pressItemUserGuide,
-            },
-          ],
-        },
-        {
-          title: Lang.get('screens.settings.listSectionItemGeneral'),
-          data: [
-            {
-              title: Lang.get('screens.settings.listItemClearCache'),
-              detailText: Lang.get('screens.settings.listItemClearCacheDetailText'),
+              title: t('screens.settings.listItemClearCache'),
+              detailText: t('screens.settings.listItemClearCacheDetailText'),
               // accessoryType: 'none',
-              onPress: this.pressItemClearCache,
+              onPress: this.handlePressItemClearCache,
             },
           ],
         },
         {
-          title: Lang.get('screens.settings.listSectionItemHelpAndFeedback'),
+          title: t('screens.settings.listSectionItemHelpAndFeedback'),
           data: [
             {
-              title: Lang.get('screens.settings.listItemGetSupport'),
-              onPress: this.pressItemGetSupport,
+              title: t('screens.settings.listItemGetSupport'),
+              onPress: this.handlePressItemGetSupport,
             },
             {
-              title: Lang.get('screens.settings.listItemSuggestions'),
-              onPress: this.pressItemSuggestions,
+              title: t('screens.settings.listItemSuggestions'),
+              onPress: this.handlePressItemSuggestions,
             },
           ],
         },
         {
-          title: Lang.get('screens.settings.listSectionItemMore'),
+          title: t('screens.settings.listSectionItemOther'),
           data: [
             {
-              title: Lang.get('screens.settings.listItemShare'),
-              detailText: Lang.get('screens.settings.listItemShareDetailText'),
-              onPress: this.pressItemShare,
+              title: t('screens.settings.listItemShare'),
+              detailText: t('screens.settings.listItemShareDetailText'),
+              onPress: this.handlePressItemShare,
             },
             {
-              title: Lang.get('screens.settings.listItemStoreReview'),
-              detailText: Lang.get('screens.settings.listItemStoreReviewDetailText'),
-              onPress: this.pressItemStoreReview,
+              title: t('screens.settings.listItemStoreReview'),
+              detailText: t('screens.settings.listItemStoreReviewDetailText'),
+              onPress: this.handlePressItemStoreReview,
             },
           ],
         },
@@ -79,66 +87,64 @@ class Settings extends Component {
     };
   }
 
-  pressItemUserGuide() {
-    this.navigation.navigate('UserGuide');
-  }
-
-  pressItemClearCache() {
+  handlePressItemClearCache() {
+    ProgressHUD.show();
     setTimeout(async () => {
       try {
-        const directory = await RNFS.pathForGroup('group.me.thecode.yilanapp');
-        const dataFiles = [
-          `${directory}/yilanData.json`,
-          `${directory}/yilanPreviewData.json`,
-          `${directory}/yilanTranslateData.json`,
-          `${directory}/yilanWikipediaData.json`,
+        const dir = await fs.pathForAppGroup(APP_GROUP);
+        const filePaths = [
+          `${dir}/files`,
+          `${dir}/yilanData.json`,
+          `${dir}/yilanPreviewData.json`,
         ];
 
-        dataFiles.forEach(async (filePath) => {
-          if (await RNFS.exists(filePath)) {
-            RNFS.unlink(filePath);
-          }
-        });
-        alert(Lang.get('screens.settings.messageClearCacheCompletion'));
+        for (let i = 0; i < filePaths.length; i += 1) {
+          const path = filePaths[i];
+          // eslint-disable-next-line
+          await fs.unlink(path);
+        }
+        ProgressHUD.showSuccess(t('screens.settings.messageClearCacheCompletion'));
+        ProgressHUD.dismiss(1500);
       } catch (error) {
-        alert(error.message);
+        ProgressHUD.showError(error.message);
+        ProgressHUD.dismiss(1500);
       } finally {
         DeviceEventEmitter.emit('appSettingsDidChange', { });
       }
     });
   }
 
-  pressItemGetSupport() {
+  handlePressItemGetSupport() {
     const options = {
-      subject: Lang.get('screens.settings.getSupportMailSubject'),
+      subject: t('screens.settings.getSupportMailSubject'),
       recipients: ['lijy91@foxmail.com'],
-      body: Lang.get('screens.settings.getSupportMailBody'),
+      body: t('screens.settings.getSupportMailBody'),
       isHTML: true,
     };
     const callback = (error) => {
       if (error) {
-        alert(Lang.get('screens.settings.messageManualGetSupport'));
+        alert(t('screens.settings.messageManualGetSupport'));
       }
     };
 
     Mailer.mail(options, callback);
   }
 
-  pressItemSuggestions() {
+  handlePressItemSuggestions() {
     Linking.openURL('https://jinshuju.net/f/0lUGZW')
       .catch((error) => {
         alert(error.message);
       });
   }
 
-  pressItemShare() {
+  handlePressItemShare() {
     Share.share({
-      message: Lang.get('screens.settings.shareMessage'),
+      message: t('screens.settings.shareMessage'),
       url: 'https://yilan.thecode.me',
     });
   }
 
-  pressItemStoreReview() {
+  handlePressItemStoreReview() {
     StoreReview.requestReview();
   }
 
@@ -147,16 +153,7 @@ class Settings extends Component {
       return null;
     }
     return (
-      <Text
-        style={{
-          paddingLeft: 12,
-          paddingRight: 12,
-          paddingTop: 12,
-          paddingBottom: 6,
-        }}
-      >
-        {section.title}
-      </Text>
+      <ListSection {...section} />
     );
   }
 
@@ -182,20 +179,21 @@ class Settings extends Component {
           margin: 20,
         }}
       >
-        <Text>{Lang.get('screens.settings.labelRevisionNumber')}</Text>
-        <Text>{`${version} (${buildNumber})`}</Text>
+        <Text>{t('screens.settings.labelRevisionNumber')}</Text>
+        <Text>{`v${version} (${buildNumber})`}</Text>
       </View>
     );
   }
 
   render() {
+    const { sectionsSource } = this.state;
     return (
       <Screen>
         <SectionList
-          sections={this.state.sectionsSource}
+          sections={sectionsSource}
           renderSectionHeader={this.renderSectionHeader}
           renderItem={this.renderItem}
-          ItemSeparatorComponent={() => <Divider style={{ marginLeft: 12 }} />}
+          ItemSeparatorComponent={() => <ListItem.Divider />}
           ListFooterComponent={this.renderListFooter}
           keyExtractor={(item, index) => `${index}`}
         />

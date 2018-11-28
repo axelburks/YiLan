@@ -1,37 +1,54 @@
 import React, { Component } from 'react';
 import { AppState, DeviceEventEmitter, FlatList } from 'react-native';
-import { ActivityIndicator, Divider, Screen } from '@blankapp/ui';
-import RNFS from 'react-native-fs';
+import {
+  ListItem,
+  Screen,
+} from '@blankapp/ui';
+import { AppBar } from '@blankapp/ui-pro';
+import { t } from '@blankapp/plugin-i18n';
+import RNFetchBlob from 'rn-fetch-blob';
 import moment from 'moment';
-import { AppBar, FileIcon, ListEmptyIndicator, ListItem } from '../../components';
-import IconNames from '../../components/Icon/IconNames';
-import Lang from '../../utilities/Lang';
+import {
+  FileIcon,
+  ListEmptyIndicator,
+} from '../../components';
+import {
+  ProgressHUD,
+} from '../../modules';
+import NavigationService from '../../navigators/NavigationService';
+import { APP_GROUP } from '../../utilities/constants';
 import resolveRouteAndParams from '../../utilities/resolveRouteAndParams';
+import { ifIphoneX } from '../../utilities/iphone-x-helper';
+
+// eslint-disable-next-line
+const fs = RNFetchBlob.fs;
 
 class Home extends Component {
   static navigationOptions = ({ navigation }) => {
     const headerRight = (
       <AppBar.IconButton
-        name={IconNames.MenuSettings}
+        iconName="settings"
         onPress={() => {
           navigation.navigate('Settings');
         }}
       />
     );
     return {
-      title: Lang.get('screens.home.title'),
+      title: t('screens.home.title'),
       headerRight,
     };
   };
 
   constructor(props) {
     super(props);
+    // eslint-disable-next-line
     this.navigation = this.props.navigation;
 
-    this.loadData = this.loadData.bind(this);
+    this.reloadData = this.reloadData.bind(this);
+
     this.handleAppStateChange = this.handleAppStateChange.bind(this);
     this.handleAppSettingsChange = this.handleAppSettingsChange.bind(this);
-    this.pressItem = this.pressItem.bind(this);
+    this.handlePressItem = this.handlePressItem.bind(this);
     this.renderListEmpty = this.renderListEmpty.bind(this);
     this.renderItem = this.renderItem.bind(this);
 
@@ -44,7 +61,10 @@ class Home extends Component {
   componentDidMount() {
     AppState.addEventListener('change', this.handleAppStateChange);
     DeviceEventEmitter.addListener('appSettingsDidChange', this.handleAppSettingsChange);
-    this.loadData();
+
+    setTimeout(async () => {
+      await this.reloadData();
+    });
   }
 
   componentWillUnmount() {
@@ -52,51 +72,54 @@ class Home extends Component {
     DeviceEventEmitter.removeListener('appSettingsDidChange', this.handleAppSettingsChange);
   }
 
-  loadData() {
-    setTimeout(async () => {
-      let itemsSource = [];
-      try {
-        const directory = await RNFS.pathForGroup('group.me.thecode.yilanapp');
-        const yilanDataJsonPath = `${directory}/yilanData.json`;
+  async reloadData() {
+    this.setState({ loading: true });
+    let itemsSource = [];
+    try {
+      const dir = await fs.pathForAppGroup(APP_GROUP);
+      const dataPath = `${dir}/yilanData.json`;
 
-        let yilanData = [];
-        if (await RNFS.exists(yilanDataJsonPath)) {
-          const yilanDataJsonString = await RNFS.readFile(yilanDataJsonPath);
-          yilanData = JSON.parse(yilanDataJsonString);
-        }
-        itemsSource = yilanData;
-      } catch (error) {
-        alert(error.message);
-      } finally {
-        this.setState({
-          loading: false,
-          itemsSource,
-        });
+      if (await fs.exists(dataPath)) {
+        const yilanDataJsonString = await fs.readFile(dataPath);
+        itemsSource = JSON.parse(yilanDataJsonString);
       }
-    });
+
+      this.setState({
+        loading: false,
+        itemsSource,
+      });
+    } catch (error) {
+      this.setState({ loading: false });
+      ProgressHUD.showError(error.message);
+      ProgressHUD.dismiss(1500);
+    }
   }
 
   handleAppStateChange(nextAppState) {
     if (nextAppState === 'active') {
-      this.loadData();
+      this.reloadData();
     }
   }
 
   handleAppSettingsChange(nextAppSettings) {
     console.log(nextAppSettings); // eslint-disable-line
-    this.loadData();
+    this.reloadData();
   }
 
-  pressItem(item) {
+  handlePressItem(item) {
     const result = resolveRouteAndParams(item);
-    this.navigation.navigate(result.routeName, result.params);
+    NavigationService.navigate(result.routeName, result.params);
   }
 
   renderListEmpty() {
+    const { loading } = this.state;
+    if (loading) {
+      return null;
+    }
     return (
       <ListEmptyIndicator
-        title={Lang.get('screens.home.messageListEmptyTitle')}
-        description={Lang.get('screens.home.messageListEmptyMessage')}
+        title={t('screens.home.messageListEmptyTitle')}
+        message={t('screens.home.messageListEmptyMessage')}
       />
     );
   }
@@ -112,7 +135,7 @@ class Home extends Component {
     const detailText = moment(date).fromNow();
     const fileName = type === 'file' ? content : `.${type}`;
 
-    const fileIconView = (
+    const renderImage = () => (
       <FileIcon
         fileName={fileName}
         isDirectory={false}
@@ -122,36 +145,33 @@ class Home extends Component {
 
     return (
       <ListItem
-        imageView={fileIconView}
-        title={title}
+        renderImage={renderImage}
+        renderTitle={() => (
+          <ListItem.Title
+            numberOfLines={2}
+          >
+            {title}
+          </ListItem.Title>
+        )}
         detailText={detailText}
-        onPress={() => this.pressItem(item)}
-        accessoryType="disclosureIndicator"
+        onPress={() => this.handlePressItem(item)}
+        accessoryType={ListItem.accessoryTypes.DisclosureIndicator}
       />
     );
   }
 
   render() {
-    if (this.state.loading) {
-      return (
-        <Screen
-          style={{
-            flex: 1,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <ActivityIndicator />
-        </Screen>
-      );
-    }
+    const { itemsSource } = this.state;
 
     return (
       <Screen>
         <FlatList
-          data={this.state.itemsSource}
+          contentContainerStyle={{
+            paddingBottom: ifIphoneX(34, 0),
+          }}
+          data={itemsSource}
           renderItem={this.renderItem}
-          ItemSeparatorComponent={() => <Divider />}
+          ItemSeparatorComponent={() => <ListItem.Divider />}
           ListEmptyComponent={() => this.renderListEmpty()}
           keyExtractor={(item, index) => `${item.uuid || index}`}
         />

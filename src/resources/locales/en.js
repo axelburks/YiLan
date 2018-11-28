@@ -1,48 +1,56 @@
 export default {
-  appName: 'YiLan',
   globals: {
+    buttonOk: 'OK',
+    buttonCancel: 'Cancel',
+    buttonYes: 'Yes',
+    buttonNo: 'No',
     types: {
       text: 'Text',
       url: 'Url',
       file: 'File',
     },
   },
-  components: {
-    dialog: {
-      ok: 'Ok',
-      cancel: 'Cancel',
-      yes: 'Yes',
-      no: 'No',
-    },
-  },
   screens: {
-    archivePreviewer: {
-      title: 'Archive Preview',
-      messageListEmptyTitle: 'Unsupported',
-      messageListEmptyMessage: '',
-    },
-    codePreviewer: {
-      title: 'Code Preview',
-    },
     home: {
       title: 'YiLan',
       messageListEmptyTitle: 'No history',
-      messageListEmptyMessage: '...',
+      messageListEmptyMessage: '',
     },
-    htmlPreviewer: {
-      title: 'HTML Preview',
+    previewOfArchive: {
+      title: 'Archive',
+      placeholderArchivePassword: 'Please enter password',
+      messageListEmptyMessage: 'Directory is empty',
+      messageArchiveEncryptedTitle: 'Archive is encrypted',
+      buttonUnarchive: 'Unarchive',
     },
-    markdownPreviewer: {
-      title: 'Markdown Preview',
+    previewOfCode: {
+      title: 'Code',
     },
-    pdfPreviewer: {
-      title: 'PDF Preview',
+    previewOfHtml: {
+      title: 'HTML',
+    },
+    previewOfMarkdown: {
+      title: 'Markdown',
+    },
+    previewOfPdf: {
+      title: 'PDF',
+    },
+    previewOfPlainText: {
+      title: 'Plain Text',
+      messageListEmptyTitle: 'Unsupported',
+      messageListEmptyMessage: ' ',
+    },
+    previewOfUnsupported: {
+      title: 'Unsupported',
+      messageListEmptyTitle: 'Unsupported',
+      messageListEmptyMessage: '',
+      buttonPreviewInPreviewOfCode: 'Preview in code previewer',
     },
     settings: {
       title: 'Settings',
       listSectionItemGeneral: 'General',
       listSectionItemHelpAndFeedback: 'Help & Feedback',
-      listSectionItemMore: 'More',
+      listSectionItemOther: 'Other',
       listItemUserGuide: 'How to use the app extension',
       listItemClearCache: 'Clear Cache',
       listItemClearCacheDetailText: '',
@@ -59,17 +67,12 @@ export default {
       messageClearCacheCompletion: 'Cache clear completion.',
       messageManualGetSupport: 'Please sent you question to lijy91@foxmail.com',
     },
-    textQuerier: {
-      title: 'Text Querier',
-    },
-    unsupported: {
-      title: 'Unsupported',
-      messageUnsupportedTitle: 'Unsupported',
-      messageUnsupportedMessage: '',
-      buttonPreviewInCodePreviewer: 'Preview in code previewer',
-    },
-    userGuide: {
-      title: 'User Guide',
+  },
+  views: {
+    unsafeModeView: {
+      messageTitle: 'Warning',
+      messageMessage: '由于扩展应用运行内存的限制，\n在查看大文件时会存在闪退情况。',
+      buttonContinue: 'Continue',
     },
   },
 };
